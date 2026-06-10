@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuickCheck QA — Your website, tested by a real QA engineer</title>
+<meta name="description" content="Micro website testing gigs from a senior QA engineer in Wellington, NZ. Bug checks from $5. 提供中英文双语网站测试服务。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAFBFC;
+    --ink:#15212C;
+    --slate:#5B6B7A;
+    --line:#E2E8EE;
+    --pass:#0E8A5F;
+    --pass-bg:#E8F5EF;
+    --fail:#C8402F;
+    --fail-bg:#FBEDEA;
+    --amber:#B97A14;
+    --amber-bg:#FCF3E3;
+    --card:#FFFFFF;
+    --mono-bg:#101820;
+    --mono-text:#D7E2EA;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter','Noto Sans SC',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    font-size:16px;
+  }
+  h1,h2,h3{font-family:'Space Grotesk','Noto Sans SC',sans-serif;line-height:1.2}
+  html[lang="zh"] body{line-height:1.75}
+  .mono{font-family:'JetBrains Mono',monospace}
+  a{color:inherit}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+
+  /* ---------- header ---------- */
+  header{
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    position:sticky;top:0;z-index:50;
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px;gap:1rem}
+  .logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.15rem;text-decoration:none;display:flex;align-items:center;gap:.5rem;white-space:nowrap}
+  .logo .tick{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:24px;height:24px;border-radius:6px;
+    background:var(--pass);color:#fff;font-size:.85rem;
+  }
+  .nav-right{display:flex;align-items:center;gap:1.5rem}
+  .nav-links{display:flex;gap:1.5rem;font-size:.92rem}
+  .nav-links a{text-decoration:none;color:var(--slate)}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-cta{
+    background:var(--ink);color:#fff!important;
+    padding:.5rem 1rem;border-radius:8px;font-weight:600;
+  }
+  .nav-cta:hover{background:#2A3B4C}
+  .lang-btn{
+    font-family:'JetBrains Mono','Noto Sans SC',monospace;font-size:.8rem;font-weight:600;
+    border:1px solid var(--line);background:var(--card);color:var(--ink);
+    padding:.45rem .8rem;border-radius:8px;cursor:pointer;white-space:nowrap;
+  }
+  .lang-btn:hover{border-color:var(--slate)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:72px 0 56px;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+  .eyebrow{
+    font-family:'JetBrains Mono','Noto Sans SC',monospace;font-size:.78rem;letter-spacing:.08em;
+    color:var(--pass);text-transform:uppercase;margin-bottom:1rem;font-weight:600;
+  }
+  .hero h1{font-size:clamp(2rem,4.4vw,3.05rem);font-weight:700;margin-bottom:1.1rem;letter-spacing:-0.02em}
+  html[lang="zh"] .hero h1{letter-spacing:0;font-size:clamp(1.8rem,4vw,2.7rem)}
+  .hero h1 em{font-style:normal;color:var(--fail)}
+  .hero p.lede{color:var(--slate);font-size:1.08rem;max-width:34rem;margin-bottom:1.6rem}
+  .hero-ctas{display:flex;gap:.75rem;flex-wrap:wrap}
+  .btn{
+    display:inline-block;padding:.75rem 1.4rem;border-radius:9px;font-weight:600;
+    text-decoration:none;font-size:.97rem;border:1px solid transparent;cursor:pointer;
+    font-family:'Inter','Noto Sans SC',sans-serif;
+  }
+  .btn:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,
+  textarea:focus-visible,button:focus-visible,summary:focus-visible{
+    outline:2px solid var(--pass);outline-offset:2px;
+  }
+  .btn-primary{background:var(--pass);color:#fff}
+  .btn-primary:hover{background:#0B7350}
+  .btn-ghost{border-color:var(--line);background:var(--card);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--slate)}
+  .hero-trust{margin-top:1.5rem;font-size:.85rem;color:var(--slate);display:flex;gap:1.25rem;flex-wrap:wrap}
+
+  /* ---------- the signature: live test run ---------- */
+  .testrun{
+    background:var(--mono-bg);border-radius:14px;overflow:hidden;
+    box-shadow:0 24px 60px -24px rgba(16,24,32,.45);
+    font-family:'JetBrains Mono',monospace;font-size:.82rem;
+  }
+  .testrun-bar{
+    display:flex;align-items:center;gap:.5rem;padding:.7rem 1rem;
+    background:#1A242E;color:#8595A4;font-size:.75rem;
+  }
+  .testrun-bar .dot{width:10px;height:10px;border-radius:50%}
+  .testrun-body{padding:1.1rem 1.2rem 1.3rem;color:var(--mono-text)}
+  .testrun-body .cmd{color:#7FB7A0;margin-bottom:.8rem}
+  .check{
+    display:flex;align-items:baseline;gap:.6rem;padding:.28rem 0;
+    opacity:0;transform:translateY(4px);
+  }
+  .check.show{opacity:1;transform:none;transition:opacity .3s ease,transform .3s ease}
+  .check .status{font-weight:600;min-width:4.2ch}
+  .check .status.pass{color:#3CC98F}
+  .check .status.fail{color:#FF7A66}
+  .check .name{color:var(--mono-text)}
+  .check .ms{margin-left:auto;color:#5E6E7D;font-size:.74rem}
+  .testrun-verdict{
+    margin-top:.9rem;padding-top:.9rem;border-top:1px dashed #2C3946;
+    color:#FF9D8D;opacity:0;
+  }
+  .testrun-verdict.show{opacity:1;transition:opacity .5s ease}
+  @media (prefers-reduced-motion:reduce){
+    .check,.testrun-verdict{opacity:1!important;transform:none!important;transition:none!important}
+    html{scroll-behavior:auto}
+  }
+
+  /* ---------- sections ---------- */
+  section{padding:64px 0}
+  .section-head{max-width:38rem;margin-bottom:2.4rem}
+  .section-head h2{font-size:1.75rem;margin-bottom:.6rem;letter-spacing:-0.01em}
+  .section-head p{color:var(--slate)}
+
+  /* ---------- pricing ---------- */
+  #services{border-top:1px solid var(--line)}
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+  .tier{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:1.6rem 1.5rem;display:flex;flex-direction:column;
+  }
+  .tier.featured{border-color:var(--pass);box-shadow:0 12px 32px -16px rgba(14,138,95,.25)}
+  .tier .badge{
+    align-self:flex-start;font-family:'JetBrains Mono','Noto Sans SC',monospace;font-size:.7rem;
+    letter-spacing:.06em;text-transform:uppercase;font-weight:600;
+    padding:.25rem .6rem;border-radius:99px;margin-bottom:1rem;
+  }
+  .badge.green{background:var(--pass-bg);color:var(--pass)}
+  .badge.amber{background:var(--amber-bg);color:var(--amber)}
+  .badge.red{background:var(--fail-bg);color:var(--fail)}
+  .tier h3{font-size:1.2rem;margin-bottom:.2rem}
+  .tier .price{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;margin:.4rem 0 .2rem}
+  .tier .price small{font-size:.85rem;color:var(--slate);font-weight:500;font-family:'Inter',sans-serif}
+  .tier .turn{font-size:.83rem;color:var(--slate);margin-bottom:1rem}
+  .tier ul{list-style:none;margin:0 0 1.4rem;flex:1}
+  .tier li{
+    padding:.35rem 0 .35rem 1.5rem;position:relative;font-size:.92rem;color:#33424F;
+  }
+  .tier li::before{
+    content:"✓";position:absolute;left:0;color:var(--pass);font-weight:700;
+  }
+  .tier .btn{text-align:center}
+
+  /* ---------- process ---------- */
+  #how{border-top:1px solid var(--line)}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1.3rem}
+  .step .num{
+    font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--pass);
+    font-weight:600;margin-bottom:.6rem;display:block;
+  }
+  .step h3{font-size:1rem;margin-bottom:.35rem}
+  .step p{font-size:.88rem;color:var(--slate)}
+
+  /* ---------- sample report ---------- */
+  #sample{border-top:1px solid var(--line)}
+  .report{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;max-width:46rem;
+  }
+  .report-head{
+    display:flex;align-items:center;justify-content:space-between;gap:1rem;
+    padding:.9rem 1.25rem;border-bottom:1px solid var(--line);background:#F3F6F9;
+    flex-wrap:wrap;
+  }
+  .report-head .mono{font-size:.78rem;color:var(--slate)}
+  .sev{
+    font-family:'JetBrains Mono','Noto Sans SC',monospace;font-size:.7rem;font-weight:600;
+    letter-spacing:.05em;padding:.22rem .55rem;border-radius:99px;
+    background:var(--fail-bg);color:var(--fail);
+  }
+  .report-body{padding:1.25rem;font-size:.92rem}
+  .report-row{display:grid;grid-template-columns:9rem 1fr;gap:.5rem;padding:.45rem 0;border-bottom:1px dashed var(--line)}
+  .report-row:last-child{border-bottom:none}
+  .report-row .k{color:var(--slate);font-size:.82rem;font-family:'JetBrains Mono','Noto Sans SC',monospace}
+  .report-row .v{color:var(--ink)}
+  .report-row .v code{
+    font-family:'JetBrains Mono',monospace;font-size:.82rem;background:#F1F4F7;
+    padding:.1rem .35rem;border-radius:4px;
+  }
+  .report-note{margin-top:1.2rem;font-size:.85rem;color:var(--slate);max-width:46rem}
+
+  /* ---------- FAQ ---------- */
+  #faq{border-top:1px solid var(--line)}
+  .faq-list{max-width:46rem}
+  .faq-item{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    margin-bottom:.75rem;overflow:hidden;
+  }
+  .faq-item summary{
+    cursor:pointer;padding:1rem 1.25rem;font-weight:600;font-size:.97rem;
+    list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  }
+  .faq-item summary::-webkit-details-marker{display:none}
+  .faq-item summary::after{
+    content:"+";font-family:'JetBrains Mono',monospace;color:var(--pass);
+    font-size:1.1rem;font-weight:600;flex-shrink:0;
+  }
+  .faq-item[open] summary::after{content:"−"}
+  .faq-item[open] summary{border-bottom:1px dashed var(--line)}
+  .faq-item .faq-a{padding:1rem 1.25rem;font-size:.93rem;color:#33424F}
+
+  /* ---------- request form ---------- */
+  #request{border-top:1px solid var(--line)}
+  .form-grid{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:1.8rem;max-width:42rem;
+  }
+  .field{margin-bottom:1.1rem}
+  .field label{display:block;font-weight:600;font-size:.9rem;margin-bottom:.35rem}
+  .field label .opt{font-weight:400;color:var(--slate)}
+  .field input,.field select,.field textarea{
+    width:100%;padding:.65rem .8rem;border:1px solid var(--line);border-radius:8px;
+    font-family:'Inter','Noto Sans SC',sans-serif;font-size:.95rem;background:var(--paper);color:var(--ink);
+  }
+  .field textarea{min-height:96px;resize:vertical}
+  .field .hint{font-size:.78rem;color:var(--slate);margin-top:.3rem}
+  .form-actions{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:.4rem}
+  .form-note{font-size:.82rem;color:var(--slate);margin-top:1rem}
+  #copied{display:none;font-size:.85rem;color:var(--pass);font-weight:600}
+
+  /* ---------- service terms ---------- */
+  #terms{border-top:1px solid var(--line)}
+  .terms-list{list-style:none;max-width:46rem;counter-reset:term}
+  .terms-list li{
+    counter-increment:term;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:1rem 1.25rem 1rem 3.4rem;margin-bottom:.75rem;position:relative;
+    font-size:.93rem;color:#33424F;
+  }
+  .terms-list li::before{
+    content:counter(term,decimal-leading-zero);
+    position:absolute;left:1.1rem;top:1rem;
+    font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;
+    color:var(--pass);
+  }
+  .terms-list li strong{display:block;color:var(--ink);margin-bottom:.15rem;font-size:.95rem}
+  .terms-note{margin-top:1.2rem;font-size:.85rem;color:var(--slate);max-width:46rem}
+
+  /* ---------- about / footer ---------- */
+  #about{border-top:1px solid var(--line)}
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start}
+  .about-grid .section-head{margin-bottom:1.2rem}
+  .about-grid p{color:#33424F;margin-bottom:1rem}
+  .cred-list{list-style:none}
+  .cred-list li{
+    padding:.55rem 0 .55rem 1.7rem;position:relative;font-size:.93rem;color:#33424F;
+    border-bottom:1px dashed var(--line);
+  }
+  .cred-list li:last-child{border-bottom:none}
+  .cred-list li::before{content:"▸";position:absolute;left:.3rem;color:var(--pass)}
+  footer{
+    border-top:1px solid var(--line);padding:2rem 0 2.5rem;
+    font-size:.85rem;color:var(--slate);
+  }
+  .foot{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:880px){
+    .hero{grid-template-columns:1fr;padding-top:48px}
+    .tiers{grid-template-columns:1fr}
+    .steps{grid-template-columns:1fr 1fr}
+    .about-grid{grid-template-columns:1fr}
+    .nav-links{display:none}
+  }
+  @media (max-width:520px){
+    .steps{grid-template-columns:1fr}
+    .report-row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#"><span class="tick">✓</span>QuickCheck QA</a>
+    <div class="nav-right">
+      <nav class="nav-links" aria-label="Main">
+        <a href="#services" data-i18n="nav_services"></a>
+        <a href="#how" data-i18n="nav_how"></a>
+        <a href="#sample" data-i18n="nav_sample"></a>
+        <a href="#faq" data-i18n="nav_faq"></a>
+        <a href="#about" data-i18n="nav_about"></a>
+        <a class="nav-cta" href="#request" data-i18n="nav_cta"></a>
+      </nav>
+      <button class="lang-btn" id="langBtn" type="button" aria-label="Switch language">中文</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <div class="wrap hero">
+    <div>
+      <p class="eyebrow" data-i18n="eyebrow"></p>
+      <h1 data-i18n="hero_h1"></h1>
+      <p class="lede" data-i18n="hero_lede"></p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#request" data-i18n="hero_cta1"></a>
+        <a class="btn btn-ghost" href="#sample" data-i18n="hero_cta2"></a>
+      </div>
+      <div class="hero-trust">
+        <span data-i18n="trust1"></span>
+        <span data-i18n="trust2"></span>
+        <span data-i18n="trust3"></span>
+      </div>
+    </div>
+
+    <!-- Signature element: live test run (kept in English in both languages — it's a tool screenshot) -->
+    <div class="testrun" aria-label="Example test run animation">
+      <div class="testrun-bar">
+        <span class="dot" style="background:#FF5F57"></span>
+        <span class="dot" style="background:#FEBC2E"></span>
+        <span class="dot" style="background:#28C840"></span>
+        <span style="margin-left:.5rem">quickcheck — your-website.co.nz</span>
+      </div>
+      <div class="testrun-body" id="testrunBody">
+        <div class="cmd">$ quickcheck run --target your-website.co.nz</div>
+        <div class="check"><span class="status pass">PASS</span><span class="name">homepage loads on mobile</span><span class="ms">812ms</span></div>
+        <div class="check"><span class="status pass">PASS</span><span class="name">navigation links resolve</span><span class="ms">1.2s</span></div>
+        <div class="check"><span class="status pass">PASS</span><span class="name">images render with alt text</span><span class="ms">640ms</span></div>
+        <div class="check"><span class="status fail">FAIL</span><span class="name">contact form submits successfully</span><span class="ms">3.4s</span></div>
+        <div class="check"><span class="status pass">PASS</span><span class="name">checkout total calculates GST</span><span class="ms">980ms</span></div>
+        <div class="testrun-verdict" data-i18n="verdict"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 data-i18n="svc_h2"></h2>
+        <p data-i18n="svc_p"></p>
+      </div>
+      <div class="tiers">
+        <div class="tier">
+          <span class="badge green" data-i18n="t1_badge"></span>
+          <h3 data-i18n="t1_name"></h3>
+          <div class="price">$5 <small>NZD</small></div>
+          <p class="turn" data-i18n="turn48"></p>
+          <ul>
+            <li data-i18n="t1_li1"></li>
+            <li data-i18n="t1_li2"></li>
+            <li data-i18n="t1_li3"></li>
+            <li data-i18n="t1_li4"></li>
+          </ul>
+          <a class="btn btn-ghost" href="#request" data-tier="Smoke Test ($5)" data-i18n="t1_btn"></a>
+        </div>
+
+        <div class="tier featured">
+          <span class="badge amber" data-i18n="t2_badge"></span>
+          <h3 data-i18n="t2_name"></h3>
+          <div class="price">$15 <small>NZD</small></div>
+          <p class="turn" data-i18n="turn48"></p>
+          <ul>
+            <li data-i18n="t2_li1"></li>
+            <li data-i18n="t2_li2"></li>
+            <li data-i18n="t2_li3"></li>
+            <li data-i18n="t2_li4"></li>
+          </ul>
+          <a class="btn btn-primary" href="#request" data-tier="Deep Check ($15)" data-i18n="t2_btn"></a>
+        </div>
+
+        <div class="tier">
+          <span class="badge red" data-i18n="t3_badge"></span>
+          <h3 data-i18n="t3_name"></h3>
+          <div class="price">$30 <small>NZD</small></div>
+          <p class="turn" data-i18n="turn72"></p>
+          <ul>
+            <li data-i18n="t3_li1"></li>
+            <li data-i18n="t3_li2"></li>
+            <li data-i18n="t3_li3"></li>
+            <li data-i18n="t3_li4"></li>
+          </ul>
+          <a class="btn btn-ghost" href="#request" data-tier="Pre-Launch Report ($30)" data-i18n="t3_btn"></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 data-i18n="how_h2"></h2>
+        <p data-i18n="how_p"></p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="num">step 01</span>
+          <h3 data-i18n="s1_h"></h3>
+          <p data-i18n="s1_p"></p>
+        </div>
+        <div class="step">
+          <span class="num">step 02</span>
+          <h3 data-i18n="s2_h"></h3>
+          <p data-i18n="s2_p"></p>
+        </div>
+        <div class="step">
+          <span class="num">step 03</span>
+          <h3 data-i18n="s3_h"></h3>
+          <p data-i18n="s3_p"></p>
+        </div>
+        <div class="step">
+          <span class="num">step 04</span>
+          <h3 data-i18n="s4_h"></h3>
+          <p data-i18n="s4_p"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMPLE REPORT -->
+  <section id="sample">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 data-i18n="rep_h2"></h2>
+        <p data-i18n="rep_p"></p>
+      </div>
+      <div class="report">
+        <div class="report-head">
+          <span class="mono">BUG-003 · deep check · example.co.nz</span>
+          <span class="sev" data-i18n="rep_sev"></span>
+        </div>
+        <div class="report-body">
+          <div class="report-row">
+            <span class="k" data-i18n="rk_summary"></span>
+            <span class="v" data-i18n="rv_summary"></span>
+          </div>
+          <div class="report-row">
+            <span class="k" data-i18n="rk_steps"></span>
+            <span class="v" data-i18n="rv_steps"></span>
+          </div>
+          <div class="report-row">
+            <span class="k" data-i18n="rk_expected"></span>
+            <span class="v" data-i18n="rv_expected"></span>
+          </div>
+          <div class="report-row">
+            <span class="k" data-i18n="rk_actual"></span>
+            <span class="v" data-i18n="rv_actual"></span>
+          </div>
+          <div class="report-row">
+            <span class="k" data-i18n="rk_env"></span>
+            <span class="v">Safari 17 / iPhone 13 · Chrome 126 / macOS</span>
+          </div>
+          <div class="report-row">
+            <span class="k" data-i18n="rk_fix"></span>
+            <span class="v" data-i18n="rv_fix"></span>
+          </div>
+        </div>
+      </div>
+      <p class="report-note" data-i18n="rep_note"></p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 data-i18n="faq_h2"></h2>
+        <p data-i18n="faq_p"></p>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary data-i18n="q1"></summary>
+          <div class="faq-a" data-i18n="a1"></div>
+        </details>
+        <details class="faq-item">
+          <summary data-i18n="q2"></summary>
+          <div class="faq-a" data-i18n="a2"></div>
+        </details>
+        <details class="faq-item">
+          <summary data-i18n="q3"></summary>
+          <div class="faq-a" data-i18n="a3"></div>
+        </details>
+        <details class="faq-item">
+          <summary data-i18n="q4"></summary>
+          <div class="faq-a" data-i18n="a4"></div>
+        </details>
+        <details class="faq-item">
+          <summary data-i18n="q5"></summary>
+          <div class="faq-a" data-i18n="a5"></div>
+        </details>
+        <details class="faq-item">
+          <summary data-i18n="q6"></summary>
+          <div class="faq-a" data-i18n="a6"></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- REQUEST FORM -->
+  <section id="request">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 data-i18n="req_h2"></h2>
+        <p data-i18n="req_p"></p>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="f-url" data-i18n="f_url"></label>
+          <input id="f-url" type="url" data-i18n-ph="f_url_ph" required>
+        </div>
+        <div class="field">
+          <label for="f-tier" data-i18n="f_tier"></label>
+          <select id="f-tier">
+            <option value="Smoke Test ($5)" data-i18n="opt1"></option>
+            <option value="Deep Check ($15)" selected data-i18n="opt2"></option>
+            <option value="Pre-Launch Report ($30)" data-i18n="opt3"></option>
+            <option value="Not sure — recommend one for me" data-i18n="opt4"></option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-focus"><span data-i18n="f_focus"></span> <span class="opt" data-i18n="f_opt"></span></label>
+          <textarea id="f-focus" data-i18n-ph="f_focus_ph"></textarea>
+          <p class="hint" data-i18n="f_hint"></p>
+        </div>
+        <div class="field">
+          <label for="f-name" data-i18n="f_name"></label>
+          <input id="f-name" type="text" data-i18n-ph="f_name_ph">
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="sendBtn" type="button" data-i18n="btn_send"></button>
+          <button class="btn btn-ghost" id="copyBtn" type="button" data-i18n="btn_copy"></button>
+          <span id="copied" data-i18n="copied_msg"></span>
+        </div>
+        <p class="form-note"><span data-i18n="form_note"></span> <a href="mailto:hello@quickcheckqa.nz" class="mono" id="emailLink">hello@quickcheckqa.nz</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICE TERMS -->
+  <section id="terms">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 data-i18n="terms_h2"></h2>
+        <p data-i18n="terms_p"></p>
+      </div>
+      <ol class="terms-list">
+        <li><strong data-i18n="tm1_h"></strong><span data-i18n="tm1_p"></span></li>
+        <li><strong data-i18n="tm2_h"></strong><span data-i18n="tm2_p"></span></li>
+        <li><strong data-i18n="tm3_h"></strong><span data-i18n="tm3_p"></span></li>
+        <li><strong data-i18n="tm4_h"></strong><span data-i18n="tm4_p"></span></li>
+        <li><strong data-i18n="tm5_h"></strong><span data-i18n="tm5_p"></span></li>
+        <li><strong data-i18n="tm6_h"></strong><span data-i18n="tm6_p"></span></li>
+      </ol>
+      <p class="terms-note" data-i18n="terms_note"></p>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="wrap about-grid">
+      <div>
+        <div class="section-head">
+          <h2 data-i18n="about_h2"></h2>
+        </div>
+        <p data-i18n="about_p1"></p>
+        <p data-i18n="about_p2"></p>
+        <p data-i18n="about_p3"></p>
+      </div>
+      <div>
+        <ul class="cred-list">
+          <li data-i18n="cred1"></li>
+          <li data-i18n="cred2"></li>
+          <li data-i18n="cred3"></li>
+          <li data-i18n="cred4"></li>
+          <li data-i18n="cred5"></li>
+          <li data-i18n="cred6"></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span><span data-i18n="foot_l"></span> · <a href="#terms" data-i18n="foot_terms" style="color:var(--slate)"></a></span>
+    <span class="mono" style="font-size:.78rem" data-i18n="foot_r"></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* =========================================================
+     i18n — all page copy lives here, in both languages.
+     Values may contain simple HTML (br/em/code) authored by us.
+  ========================================================== */
+  var I18N = {
+    en: {
+      nav_services:"Services", nav_how:"How it works", nav_sample:"Sample report",
+      nav_faq:"FAQ", nav_about:"About", nav_cta:"Request a test",
+      eyebrow:"// micro QA gigs · wellington, nz",
+      hero_h1:"Your website has a bug.<br>I'll find it <em>before your customers do.</em>",
+      hero_lede:"I'm a senior QA engineer with 15+ years testing government and enterprise systems. Send me your site, and within 48 hours you get a clear, prioritised bug report — starting at $5.",
+      hero_cta1:"Request a $5 quick check", hero_cta2:"See a sample report",
+      trust1:"✓ No subscriptions", trust2:"✓ Pay only when you're happy", trust3:"✓ Real human testing, not a bot scan",
+      verdict:"✗ 1 issue found — your contact form has been silently failing.<br>&nbsp;&nbsp;How many enquiries did you lose this month?",
+      svc_h2:"Pick the depth you need",
+      svc_p:"Fixed prices in NZD. No quotes, no calls, no surprises. Every tier ends with a written report you can hand straight to your developer.",
+      t1_badge:"Quick check", t1_name:"Smoke Test",
+      t1_li1:"15-minute pass over your key pages", t1_li2:"Broken links, layout glitches, obvious bugs",
+      t1_li3:"Tested on desktop + mobile", t1_li4:"Short report with screenshots",
+      t1_btn:"Choose Smoke Test",
+      t2_badge:"Most popular", t2_name:"Deep Check",
+      t2_li1:"One full user journey, end to end (e.g. signup, enquiry, checkout)",
+      t2_li2:"Forms, validation, and error states", t2_li3:"Chrome, Safari + one mobile device",
+      t2_li4:"Prioritised bug report with repro steps",
+      t2_btn:"Choose Deep Check",
+      t3_badge:"Full audit", t3_name:"Pre-Launch Report",
+      t3_li1:"Whole-site review before you go live", t3_li2:"Usability + accessibility quick wins",
+      t3_li3:"Every issue rated by severity", t3_li4:"15-minute follow-up Q&amp;A by email",
+      t3_btn:"Choose Pre-Launch",
+      turn48:"Delivered within 48 hours", turn72:"Delivered within 72 hours",
+      how_h2:"How it works",
+      how_p:"The whole thing runs over email. You never have to install anything or hop on a call.",
+      s1_h:"Send your link", s1_p:"Fill in the request form with your site's URL and what worries you most.",
+      s2_h:"I test it by hand", s2_p:"I work through your site the way a real customer would — clicking, typing, breaking things.",
+      s3_h:"You get the report", s3_p:"Clear findings with screenshots, severity ratings, and exact steps to reproduce each bug.",
+      s4_h:"Pay if you're happy", s4_p:"Bank transfer or PayPal after you've read the report. Not useful? Don't pay.",
+      rep_h2:"What a finding looks like",
+      rep_p:"No jargon walls. Each bug is written so your developer can fix it without asking you a single question.",
+      rep_sev:"SEV 1 — BLOCKS SALES",
+      rk_summary:"summary", rk_steps:"steps", rk_expected:"expected", rk_actual:"actual",
+      rk_env:"tested on", rk_fix:"suggested fix",
+      rv_summary:"Checkout fails silently when the postcode field contains a space",
+      rv_steps:"1. Add any product to cart → 2. Proceed to checkout → 3. Enter postcode as <code>6011&nbsp;</code> (trailing space) → 4. Click <code>Pay now</code>",
+      rv_expected:"Postcode is trimmed and payment proceeds",
+      rv_actual:"Button spinner runs forever; no error shown; payment never submits",
+      rv_fix:"Trim whitespace on the postcode input before validation",
+      rep_note:"Mobile users type trailing spaces constantly — autocomplete adds them. A bug like this can quietly cost a store every mobile sale it nearly made.",
+      faq_h2:"Frequently asked questions",
+      faq_p:"Straight answers. If yours isn't here, just email me.",
+      q1:"Do I need to give you passwords or admin access?",
+      a1:"No. I test your site the way a visitor would — no admin access, no server access, no code access. If you want a login flow tested, create a throwaway test account for me and delete it afterwards. Never send me real credentials.",
+      q2:"What exactly do I receive?",
+      a2:"A written report by email: each issue gets a severity rating, a screenshot, exact steps to reproduce it, and a plain-language note on why it matters. You can forward it directly to your developer — it's written so they won't need to ask you anything.",
+      q3:"How do I pay?",
+      a3:"After you've read the report, by NZ bank transfer or PayPal. If the report genuinely isn't useful to you, don't pay. I'm betting my work speaks for itself.",
+      q4:"Is this a security test? Will it affect my live site?",
+      a4:"No — this is functional and usability testing, not penetration testing or hacking. I only do what an ordinary visitor could do. I won't place real orders or trigger real payments without agreeing it with you first.",
+      q5:"What if you don't find any bugs?",
+      a5:"You still get the full report listing everything I tested and confirmed working. A clean bill of health from an independent tester is worth something too — especially right before a launch. That said, in 15 years I've rarely met a site with nothing to report.",
+      q6:"可以用中文沟通吗? Do you work in Chinese?",
+      a6:"可以。I'm fluent in Mandarin — the whole process, from request to final report, can be done entirely in Chinese, English, or both. Use the 中文 button at the top of this page.",
+      req_h2:"Request a test",
+      req_p:"Fill this in and hit the button — it opens an email to me with everything pre-filled. I'll reply within one working day to confirm.",
+      f_url:"Your website URL", f_url_ph:"https://your-website.co.nz",
+      f_tier:"Which check?",
+      opt1:"Smoke Test ($5)", opt2:"Deep Check ($15)", opt3:"Pre-Launch Report ($30)", opt4:"Not sure — recommend one for me",
+      f_focus:"What worries you most?", f_opt:"(optional)",
+      f_focus_ph:"e.g. We just redesigned our checkout and sales dipped. Can you check the payment flow on mobile?",
+      f_hint:"The more specific you are, the more value you get from the time.",
+      f_name:"Your name", f_name_ph:"Jane from Acme Plumbing",
+      btn_send:"Open email to send request", btn_copy:"Copy request instead",
+      copied_msg:"Copied — paste it into any email or DM ✓",
+      form_note:"Prefer to skip the form? Email me directly:",
+      about_h2:"Who's testing your site?",
+      about_p1:"Kia ora — I'm Henry, a senior test analyst based in Wellington. For over fifteen years I've tested the systems New Zealanders rely on every day, across government agencies and enterprise platforms.",
+      about_p2:"Big organisations pay serious money for that kind of scrutiny. QuickCheck exists because small businesses deserve the same eyes on their site — at a price that makes sense for a five-page website, not a five-year programme of work.",
+      about_p3:"Every check is done by hand, by me. No outsourcing, no automated scanner pretending to be a person.",
+      cred1:"15+ years in software quality assurance",
+      cred2:"Government &amp; enterprise systems background",
+      cred3:"Test automation engineer (Playwright, TypeScript, API testing)",
+      cred4:"ISTQB-certified testing practitioner",
+      cred5:"Based in Wellington — NZ business hours, NZ context",
+      cred6:"Fluent in English and Mandarin Chinese 中英文双语服务",
+      terms_h2:"How I work — service terms",
+      terms_p:"Plain-language ground rules. They protect your site, your data, and both of us.",
+      tm1_h:"Browser-only testing",
+      tm1_p:"I test through a standard, up-to-date web browser only. I never download or run files from your site, and never install software or browser extensions it asks for. If your site requires either, I'll flag it to you instead of doing it.",
+      tm2_h:"No real credentials, ever",
+      tm2_p:"I will never ask for your passwords, admin panel, or server access. Login flows are tested with a throwaway test account that you create and delete afterwards. Anyone who asks for your real credentials — including someone claiming to be me — should be refused.",
+      tm3_h:"Every link is safety-checked first",
+      tm3_p:"Before testing starts, I screen the URL with independent security tools. I may decline a request if a site looks unsafe or doesn't match its description — if I decline, you owe nothing.",
+      tm4_h:"Functional testing, not hacking",
+      tm4_p:"This is functional and usability testing, not penetration testing or a security audit. I only do what an ordinary visitor could do, and I don't attempt to bypass any protections.",
+      tm5_h:"Your live site stays safe",
+      tm5_p:"No real orders, real payments, or irreversible actions are triggered without your written agreement first. If a test step could affect real customers or real money, I ask before touching it.",
+      tm6_h:"Your findings stay private",
+      tm6_p:"Bug reports are shared with you alone. I don't publish, resell, or reuse anything I learn about your site or business.",
+      terms_note:"Requesting a test means you confirm you own the site or have the owner's permission to have it tested.",
+      foot_terms:"Service terms",
+      foot_l:"© 2026 QuickCheck QA · Wellington, New Zealand",
+      foot_r:"tests passed: people who found their bug first ✓"
+    },
+    zh: {
+      nav_services:"服务项目", nav_how:"服务流程", nav_sample:"报告样例",
+      nav_faq:"常见问题", nav_about:"关于我", nav_cta:"预约测试",
+      eyebrow:"// 网站微测试服务 · 新西兰惠灵顿",
+      hero_h1:"你的网站一定有 bug。<br><em>赶在客户发现之前</em>,让我先找到它。",
+      hero_lede:"我是一名拥有 15 年以上经验的高级 QA 工程师,长期为新西兰政府和企业系统做测试。把网址发给我,48 小时内你会收到一份清晰、按优先级排列的 bug 报告——起价仅 $5 纽币。",
+      hero_cta1:"预约 $5 快速检测", hero_cta2:"查看报告样例",
+      trust1:"✓ 无订阅、无套路", trust2:"✓ 满意后再付款", trust3:"✓ 真人手工测试,不是机器扫描",
+      verdict:"✗ 发现 1 个问题——你的联系表单一直在悄悄失败。<br>&nbsp;&nbsp;这个月你流失了多少咨询?",
+      svc_h2:"选择适合你的检测深度",
+      svc_p:"纽币固定价格,无需报价、无需通话、没有隐藏费用。每个套餐都附带一份可以直接转给开发人员的书面报告。",
+      t1_badge:"快速检测", t1_name:"冒烟测试 Smoke Test",
+      t1_li1:"15 分钟检查核心页面", t1_li2:"死链、排版错位、明显 bug",
+      t1_li3:"桌面端 + 移动端测试", t1_li4:"附截图的简明报告",
+      t1_btn:"选择冒烟测试",
+      t2_badge:"最受欢迎", t2_name:"深度检测 Deep Check",
+      t2_li1:"一条完整用户流程的端到端测试(如注册、咨询、下单)",
+      t2_li2:"表单、输入校验和错误提示", t2_li3:"Chrome、Safari + 一台真实手机",
+      t2_li4:"按优先级排列、附复现步骤的 bug 报告",
+      t2_btn:"选择深度检测",
+      t3_badge:"全面审查", t3_name:"上线前报告 Pre-Launch",
+      t3_li1:"网站上线前的全站审查", t3_li2:"易用性 + 无障碍快速改进建议",
+      t3_li3:"每个问题按严重程度评级", t3_li4:"15 分钟邮件答疑",
+      t3_btn:"选择上线前报告",
+      turn48:"48 小时内交付", turn72:"72 小时内交付",
+      how_h2:"服务流程",
+      how_p:"全程通过邮件完成。不需要安装任何东西,也不用打电话。",
+      s1_h:"发来你的网址", s1_p:"在预约表单里填上网站地址,以及你最担心的问题。",
+      s2_h:"我亲手测试", s2_p:"我会像一个真实顾客那样使用你的网站——点击、输入、想办法把它弄坏。",
+      s3_h:"你收到报告", s3_p:"清晰的发现:截图、严重程度评级,以及每个 bug 的精确复现步骤。",
+      s4_h:"满意再付款", s4_p:"看完报告后通过银行转账或 PayPal 付款。觉得没用?那就不用付。",
+      rep_h2:"报告里的 bug 长这样",
+      rep_p:"没有术语轰炸。每个 bug 的写法,都能让你的开发人员不用问你任何问题就直接动手修。",
+      rep_sev:"严重级 1 — 阻断销售",
+      rk_summary:"摘要", rk_steps:"复现步骤", rk_expected:"预期结果", rk_actual:"实际结果",
+      rk_env:"测试环境", rk_fix:"修复建议",
+      rv_summary:"邮编输入框含空格时,结账流程静默失败",
+      rv_steps:"1. 任意商品加入购物车 → 2. 进入结账页 → 3. 邮编输入 <code>6011&nbsp;</code>(末尾带空格)→ 4. 点击 <code>Pay now</code>",
+      rv_expected:"系统应自动去除空格,支付正常进行",
+      rv_actual:"按钮一直转圈;不显示任何错误;支付永远无法提交",
+      rv_fix:"在校验前对邮编输入做去空格处理(trim)",
+      rep_note:"移动端用户经常输入多余的空格——输入法自动补全就会带上。这样的 bug 会悄悄吃掉你几乎成交的每一单移动端生意。",
+      faq_h2:"常见问题",
+      faq_p:"直接的回答。没找到你想问的?直接发邮件给我。",
+      q1:"需要把密码或后台权限给你吗?",
+      a1:"不需要。我以普通访客的身份测试你的网站——不需要管理员权限、服务器权限或代码权限。如果需要测试登录流程,请为我创建一个临时测试账号,测完即可删除。请永远不要把真实账号密码发给任何人。",
+      q2:"我具体会收到什么?",
+      a2:"一份邮件发送的书面报告:每个问题都有严重程度评级、截图、精确的复现步骤,以及一段说明它为什么重要的大白话。你可以直接转发给开发人员——报告的写法保证他们不需要再来问你任何问题。",
+      q3:"怎么付款?",
+      a3:"看完报告之后,通过新西兰银行转账或 PayPal 付款。如果报告对你确实没有价值,可以不付。我相信我的工作能为自己说话。",
+      q4:"这是安全测试吗?会影响我正在运行的网站吗?",
+      a4:"不是——这是功能和易用性测试,不是渗透测试或黑客攻击。我只做一个普通访客能做的操作,不会在未与你确认的情况下下真实订单或触发真实付款。",
+      q5:"如果你什么 bug 都没找到呢?",
+      a5:"你仍然会收到完整报告,列出我测试并确认正常的所有项目。一份来自独立测试人员的「健康证明」本身也有价值——尤其是在上线前。不过说实话,做了 15 年测试,我很少遇到完全无可挑剔的网站。",
+      q6:"可以全程用中文沟通吗?",
+      a6:"可以。我的中文是母语水平——从预约到最终报告,全程可以完全用中文、英文,或中英混合进行。给华人客户的报告可以直接用中文撰写。",
+      req_h2:"预约测试",
+      req_p:"填好下面的内容,点击按钮——会自动打开一封内容写好的邮件。我会在一个工作日内回复确认。",
+      f_url:"你的网站网址", f_url_ph:"https://your-website.co.nz",
+      f_tier:"选择哪种检测?",
+      opt1:"冒烟测试($5)", opt2:"深度检测($15)", opt3:"上线前报告($30)", opt4:"不确定——帮我推荐一个",
+      f_focus:"你最担心什么?", f_opt:"(选填)",
+      f_focus_ph:"例如:我们刚改版了结账页面,之后销量下降了。能帮我重点查一下手机端的支付流程吗?",
+      f_hint:"描述得越具体,这段测试时间对你的价值就越高。",
+      f_name:"你的称呼", f_name_ph:"例如:王太太(奥克兰餐厅)",
+      btn_send:"打开邮件发送请求", btn_copy:"或复制请求内容",
+      copied_msg:"已复制——粘贴到任何邮件或微信都可以 ✓",
+      form_note:"不想填表?直接发邮件给我:",
+      about_h2:"谁来测试你的网站?",
+      about_p1:"Kia ora,我是 Henry,常驻惠灵顿的高级测试分析师。十五年来,我一直在测试新西兰人每天都依赖的系统,服务对象包括多个政府部门和企业平台。",
+      about_p2:"大机构为这种级别的检验支付高昂费用。QuickCheck 存在的意义,是让小生意也能享受同样专业的审视——价格按一个五页的小网站来定,而不是按一个五年的大项目。",
+      about_p3:"每一次检测都由我亲手完成。不外包,也不会用自动扫描工具冒充真人。",
+      cred1:"15 年以上软件质量保证经验",
+      cred2:"政府与企业系统测试背景",
+      cred3:"测试自动化工程师(Playwright、TypeScript、API 测试)",
+      cred4:"ISTQB 认证测试从业者",
+      cred5:"常驻惠灵顿——新西兰工作时间,懂本地市场",
+      cred6:"中英文双语服务,报告可用中文撰写",
+      terms_h2:"我的工作方式——服务条款",
+      terms_p:"大白话写的基本规则,保护你的网站、你的数据,也保护我们双方。",
+      tm1_h:"只通过浏览器测试",
+      tm1_p:"我只使用标准的、保持最新的浏览器进行测试。绝不下载或运行你网站上的任何文件,也绝不安装它要求的任何软件或浏览器扩展。如果你的网站需要这些,我会先向你说明,而不是直接执行。",
+      tm2_h:"永远不需要真实账号密码",
+      tm2_p:"我绝不会索要你的密码、管理后台或服务器权限。登录流程一律使用你临时创建的测试账号,测完即删。任何向你索要真实密码的人——包括自称是我的人——都应该被拒绝。",
+      tm3_h:"每个链接先做安全预检",
+      tm3_p:"测试开始前,我会用独立的安全工具检查网址。如果网站看起来不安全,或与描述不符,我可能拒绝接单——拒单不收取任何费用。",
+      tm4_h:"功能测试,不是黑客攻击",
+      tm4_p:"这是功能和易用性测试,不是渗透测试或安全审计。我只做一个普通访客能做的操作,不会尝试绕过任何防护。",
+      tm5_h:"保证你的线上业务安全",
+      tm5_p:"未经你书面同意,绝不触发真实订单、真实付款或任何不可逆的操作。如果某个测试步骤可能影响真实客户或真实资金,我会先问再动。",
+      tm6_h:"你的测试结果保密",
+      tm6_p:"bug 报告只发给你一个人。关于你网站和生意的任何信息,我都不会公开、转售或挪作他用。",
+      terms_note:"提交测试请求即表示你确认自己是该网站的所有者,或已获得所有者的测试授权。",
+      foot_terms:"服务条款",
+      foot_l:"© 2026 QuickCheck QA · 新西兰惠灵顿",
+      foot_r:"tests passed: people who found their bug first ✓"
+    }
+  };
+
+  var currentLang = 'en';
+
+  function applyLang(lang){
+    currentLang = lang;
+    var dict = I18N[lang];
+    document.documentElement.setAttribute('lang', lang);
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+      var key = el.getAttribute('data-i18n-ph');
+      if (dict[key] !== undefined) el.setAttribute('placeholder', dict[key]);
+    });
+    document.getElementById('langBtn').textContent = (lang === 'en') ? '中文' : 'EN';
+    document.title = (lang === 'en')
+      ? 'QuickCheck QA — Your website, tested by a real QA engineer'
+      : 'QuickCheck QA — 真人 QA 工程师为你测试网站 · 新西兰';
+  }
+
+  document.getElementById('langBtn').addEventListener('click', function(){
+    applyLang(currentLang === 'en' ? 'zh' : 'en');
+  });
+
+  applyLang('en'); // initial render
+
+  /* ----- animate the hero test run ----- */
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var checks = document.querySelectorAll('#testrunBody .check');
+  var verdict = document.querySelector('.testrun-verdict');
+  if (reduce) {
+    checks.forEach(function(c){ c.classList.add('show'); });
+    verdict.classList.add('show');
+  } else {
+    var delay = 500;
+    checks.forEach(function(c, i){
+      setTimeout(function(){ c.classList.add('show'); }, delay + i * 480);
+    });
+    setTimeout(function(){ verdict.classList.add('show'); }, delay + checks.length * 480 + 300);
+  }
+
+  /* ----- tier buttons preselect the dropdown (values are language-independent) ----- */
+  document.querySelectorAll('[data-tier]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.getElementById('f-tier').value = btn.getAttribute('data-tier');
+    });
+  });
+
+  /* ----- build the request message ----- */
+  var EMAIL = 'hello@quickcheckqa.nz'; // ← change this to your real email
+
+  function buildBody(){
+    var url   = document.getElementById('f-url').value || '(no URL given)';
+    var tier  = document.getElementById('f-tier').value; // always the English value
+    var focus = document.getElementById('f-focus').value || '(none — general check)';
+    var name  = document.getElementById('f-name').value || '(no name given)';
+    if (currentLang === 'zh') {
+      return 'Henry 你好,\n\n我想预约一次网站检测。\n\n' +
+        '网站: ' + url + '\n服务: ' + tier + '\n主要担心: ' + focus + '\n称呼: ' + name + '\n\n谢谢!';
+    }
+    return 'Hi Henry,\n\nI\'d like to request a website check.\n\n' +
+      'Website: ' + url + '\nService: ' + tier + '\nMain concern: ' + focus + '\nName: ' + name + '\n\nThanks!';
+  }
+
+  // hook for automated testing
+  window.__quickcheck = { buildBody: buildBody, email: EMAIL, applyLang: applyLang, getLang: function(){ return currentLang; } };
+
+  document.getElementById('sendBtn').addEventListener('click', function(){
+    var subject = encodeURIComponent(
+      (currentLang === 'zh' ? '网站检测预约: ' : 'QuickCheck request: ') +
+      document.getElementById('f-tier').value
+    );
+    var body = encodeURIComponent(buildBody());
+    window.location.href = 'mailto:' + EMAIL + '?subject=' + subject + '&body=' + body;
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    var text = buildBody();
+    function done(){
+      var c = document.getElementById('copied');
+      c.style.display = 'inline';
+      setTimeout(function(){ c.style.display = 'none'; }, 3500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function(){ fallback(text); done(); });
+    } else { fallback(text); done(); }
+    function fallback(t){
+      var ta = document.createElement('textarea');
+      ta.value = t; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+  });
+})();
+</script>
+</body>
+</html>

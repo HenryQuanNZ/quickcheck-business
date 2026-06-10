@@ -1,0 +1,13 @@
+{
+  "name": "quickcheck-business",
+  "version": "1.0.0",
+  "private": true,
+  "description": "QuickCheck QA — micro website-testing service: site, test suite, pre-gig safety tooling",
+  "scripts": {
+    "test": "node tests/site.test.js",
+    "precheck": "bash tools/precheck.sh"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}
