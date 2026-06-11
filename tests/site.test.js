@@ -137,7 +137,9 @@ check('footer links to terms', !!document.querySelector('footer a[href="#terms"]
 /* ---------- send + copy buttons ---------- */
 document.getElementById('sendBtn').click();
 check('send button triggers mailto navigation', navigationAttempted);
-check('email placeholder still flagged for replacement', qc.email === 'hello@quickcheckqa.nz');
+check('configured email looks valid', /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(qc.email));
+check('footer mailto matches configured email',
+  document.getElementById('emailLink').getAttribute('href') === 'mailto:' + qc.email);
 
 document.getElementById('copyBtn').click();
 setTimeout(() => {
